@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  No Tickets Here !
+{% endblock %}
+
+{% block body %}
+  {% autoescape off %}
+    <h1> {{ body }} </h1>
+  {% endautoescape %}
+{% endblock %}

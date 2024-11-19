@@ -1,0 +1,15 @@
+{% extends 'base.html' %}>
+
+{% block title %}
+    Ticket number
+{% endblock %}
+
+
+{% block body %}
+    <h1> You took ticket number {{pk}} </h1>
+
+      <a href="{% url 'ticket_form' category_id=category_id pk=pk%}">
+        Choose current ticket
+      </a>
+
+{% endblock %}
