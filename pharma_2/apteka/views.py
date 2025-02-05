@@ -1,13 +1,12 @@
 import ast
 import random
 
-from django import http
 from django.db import transaction
 from django.http import HttpRequest
 from django.shortcuts import render, get_object_or_404
 
 from .forms import AnswerForm
-from .models import Category, Question, ExamManager, Answer
+from .models import Category, Question, ExamManager
 
 
 def category_list(request: HttpRequest):
@@ -22,6 +21,7 @@ def category_list(request: HttpRequest):
 
     exam_manager = ExamManager.objects.first()
     exam_manager.right_answers_counter = 0
+    exam_manager.current_question_number_in_tests = 0
     exam_manager.save()
 
     return render (request, 'start.html', context=context)
@@ -29,7 +29,7 @@ def category_list(request: HttpRequest):
 
 def ticket_request(request: HttpRequest, pk):
     print('request = ', request.POST)
-    category = Category.objects.select_for_update().get(id=pk)
+    category = Category.objects.get(id=pk)
     # При помощи библиотеки 'ast', получаем список из строки со списком
     list_of_possible_tickets_ids = ast.literal_eval(category.possible_ticket_numbers)
     print('list_of_possible_tickets_ids = ', list_of_possible_tickets_ids)
@@ -54,29 +54,17 @@ def ticket_request(request: HttpRequest, pk):
         exam_manager = ExamManager.objects.select_for_update().first()
         exam_manager.current_question_number_in_tests = ticket.id
         exam_manager.save()
-    form = AnswerForm()
-    if request.method == 'POST':
 
-        # my_instance = Answer.objects.get(id=1)
+    if request.method == 'POST':
+        # my_instance = Answer.objects.get(id=ticket.id)
         # form = AnswerForm(request.POST, instance=my_instance)
 
-        print('data = ', request.POST)
         form = AnswerForm(request.POST)
         # print('form.cleaned_data = ', form.cleaned_data)
         print('data_after_form = ', request.POST)
         print('form.fields_after_form = ', form.fields)
-        # print('request.POST["content"] = ', request.POST['content'])
-        # print(request.POST['content'][1])
         print(form.errors)
         print(form.non_field_errors)
-
-        # unit_id = request.POST.get('content')
-        # form.fields['content'].choices = [(unit_id, unit_id)]
-
-        # data = {
-        #     'content': form.cleaned_data['content']}
-        # print('form.cleaned_data = ', form.cleaned_data)
-        # print('DATA = ', data)
 
         if form.is_valid():
             print('form is valid')
@@ -88,9 +76,12 @@ def ticket_request(request: HttpRequest, pk):
             # form = AnswerForm()
             # return render(request, 'ticket.html', {'ticket': ticket, 'form': form})
 
-            return http.HttpResponseRedirect('')
+            # return http.HttpResponseRedirect('')
+            # return render(request, 'ticket.html', {'ticket': ticket, 'form': form})
     else:
         print('form is invalid')
         form = AnswerForm()
-        print(form)
+    print(40 * '*')
+    print()
+    print()
     return render(request, 'ticket.html', {'ticket': ticket, 'form': form})

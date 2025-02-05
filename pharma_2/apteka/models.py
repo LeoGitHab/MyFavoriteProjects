@@ -36,7 +36,9 @@ class Answer(models.Model):
 
 
 class ExamManager(models.Model):
+    # Для фиксации выбранного билета
     current_question_number_in_tests = models.IntegerField(blank=True, default=1)
+    # Пока не реализовано
     right_answers_counter = models.IntegerField(blank=True, null=True, default=0)
 
     def __str__(self):
